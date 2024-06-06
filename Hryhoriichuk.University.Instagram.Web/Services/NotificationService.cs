@@ -27,37 +27,44 @@ namespace Hryhoriichuk.University.Instagram.Web.Services
 
         public async Task CreateNotificationAsync(string notificationType, string userIdTriggered, string userIdReceived, int? postId)
         {
-            var notification = new Notification
+            if (userIdTriggered != userIdReceived)
             {
-                NotificationType = notificationType,
-                UserIdTriggered = userIdTriggered,
-                UserIdReceived = userIdReceived,
-                PostId = postId,
-                Timestamp = DateTime.Now,
-                IsRead = false
-            };
+                var notification = new Notification
+                {
+                    NotificationType = notificationType,
+                    UserIdTriggered = userIdTriggered,
+                    UserIdReceived = userIdReceived,
+                    PostId = postId,
+                    Timestamp = DateTime.Now,
+                    IsRead = false
+                };
 
-            notification.Message = GetMessageForNotification(notification);
+                notification.Message = GetMessageForNotification(notification);
 
-            _context.Notifications.Add(notification);
-            await _context.SaveChangesAsync();
+                _context.Notifications.Add(notification);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task CreateNotificationNoPost(string notificationType, string userIdTriggered, string userIdReceived)
         {
-            var notification = new Notification
+            if (userIdTriggered != userIdReceived)
             {
-                NotificationType = notificationType,
-                UserIdTriggered = userIdTriggered,
-                UserIdReceived = userIdReceived,
-                PostId = null, // Set PostId to null when creating a notification without a post
-                Timestamp = DateTime.Now,
-                IsRead = false
-            };
+                var notification = new Notification
+                {
+                    NotificationType = notificationType,
+                    UserIdTriggered = userIdTriggered,
+                    UserIdReceived = userIdReceived,
+                    PostId = null, // Set PostId to null when creating a notification without a post
+                    Timestamp = DateTime.Now,
+                    IsRead = false
+                };
 
-            notification.Message = GetMessageForNotification(notification);
+                notification.Message = GetMessageForNotification(notification);
 
-            _context.Notifications.Add(notification);
+                _context.Notifications.Add(notification);
+            }
+
         }
 
         public async Task DeleteNotificationAsync(int notificationId)

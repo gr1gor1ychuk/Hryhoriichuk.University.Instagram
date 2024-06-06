@@ -42,5 +42,12 @@ namespace Hryhoriichuk.University.Instagram.Web.Controllers
 
             return View(feedPosts);
         }
+
+        [HttpGet]
+        [Route("About")]
+        public IActionResult About()
+        {
+            return View();
+        }
     }
 }

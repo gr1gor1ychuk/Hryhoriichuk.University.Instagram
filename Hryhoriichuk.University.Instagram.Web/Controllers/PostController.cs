@@ -22,13 +22,15 @@ namespace Hryhoriichuk.University.Instagram.Web.Controllers
         private readonly AuthDbContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly INotificationService _notificationService;
+        private readonly BlobStorageService _blobStorageService;
 
-        public PostController(UserManager<ApplicationUser> userManager, AuthDbContext context, IWebHostEnvironment webHostEnvironment, INotificationService notificationService)
+        public PostController(UserManager<ApplicationUser> userManager, AuthDbContext context, IWebHostEnvironment webHostEnvironment, INotificationService notificationService, BlobStorageService blobStorageService)
         {
             _userManager = userManager;
             _context = context;
             _webHostEnvironment = webHostEnvironment;
             _notificationService = notificationService;
+            _blobStorageService = blobStorageService;
         }
 
         [HttpGet]
@@ -44,7 +46,7 @@ namespace Hryhoriichuk.University.Instagram.Web.Controllers
             if (file != null && file.Length > 0)
             {
                 // Check file extension
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".bmp", ".mp4", ".avi", ".mkv" };
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".mp4" };
                 var fileExtension = Path.GetExtension(file.FileName).ToLower();
                 if (!allowedExtensions.Contains(fileExtension))
                 {
@@ -63,33 +65,28 @@ namespace Hryhoriichuk.University.Instagram.Web.Controllers
                 // Generate unique file name
                 var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
 
-                // Get the path where file will be saved
-                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
-                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                // Save the file to the uploads folder
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
+                Stream uploadStream;
+                string contentType;
 
                 if (!string.IsNullOrEmpty(croppedImageData))
                 {
                     // Convert the base64 string to a byte array
                     byte[] bytes = Convert.FromBase64String(croppedImageData);
-                    using (var stream = new MemoryStream(bytes))
-                    {
-                        // Save the cropped image to the uploads folder
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await stream.CopyToAsync(fileStream);
-                        }
-                    }
+                    uploadStream = new MemoryStream(bytes);
+                    contentType = "image/jpeg"; // Set the content type for the cropped image
+                }
+                else
+                {
+                    // Create a memory stream from the uploaded file
+                    uploadStream = new MemoryStream();
+                    await file.CopyToAsync(uploadStream);
+                    uploadStream.Position = 0; // Reset stream position
+                    contentType = file.ContentType; // Use the content type from the uploaded file
                 }
 
-
-                // Set the image path for the post
-                post.ImagePath = "/uploads/" + uniqueFileName;
+                // Use the BlobStorageService to upload the file
+                var blobUrl = await _blobStorageService.UploadFileAsync(uploadStream, uniqueFileName, contentType);
+                post.ImagePath = blobUrl;
 
                 // Set other properties of the post
                 post.DatePosted = DateTime.Now;
@@ -110,6 +107,7 @@ namespace Hryhoriichuk.University.Instagram.Web.Controllers
                 return View(post);
             }
         }
+
 
         [HttpGet]
         [Authorize]

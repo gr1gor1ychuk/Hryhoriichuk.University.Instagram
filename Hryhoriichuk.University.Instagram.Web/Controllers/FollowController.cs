@@ -130,7 +130,7 @@ namespace Hryhoriichuk.University.Instagram.Web.Controllers
             return RedirectToAction("Index", "Profile", new { username = userToCancelRequest.UserName });
         }
 
-
+        [HttpGet]
         [Route("FollowRequests")]
         public async Task<IActionResult> FollowRequests()
         {

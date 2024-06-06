@@ -273,6 +273,7 @@ namespace Hryhoriichuk.University.Instagram.Web.Controllers
             return PartialView("_StoryPartial", model);
         }
 
+        [HttpGet]
         [Route("Privacy")]
         public async Task<IActionResult> Privacy()
         {
@@ -305,6 +306,7 @@ namespace Hryhoriichuk.University.Instagram.Web.Controllers
         }
 
         [HttpPost]
+        [Route("Profile/UpdatePrivacySettings")]
         public async Task<IActionResult> UpdatePrivacySettings(bool isPrivate)
         {
             var currentUser = await _userManager.GetUserAsync(User);
@@ -321,6 +323,7 @@ namespace Hryhoriichuk.University.Instagram.Web.Controllers
         }
 
         [HttpPost]
+        [Route("Profile/UpdateCommentPrivacy")]
         public async Task<IActionResult> UpdateCommentPrivacy(int commentPrivacy)
         {
             Console.WriteLine($"Received commentPrivacy value: {commentPrivacy}");

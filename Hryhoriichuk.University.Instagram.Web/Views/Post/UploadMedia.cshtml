@@ -17,26 +17,33 @@
         <label for="caption">Caption:</label>
         <input type="text" name="Caption" id="caption" class="form-control">
     </div>
-    <!-- Image preview and cropping area -->
+    <!-- Image preview area -->
     <div class="form-group">
-        <img id="image-preview" src="#" alt="Image Preview">
+        <img id="image-preview" src="#" alt="Image Preview" style="max-width: 500px; display: none;">
     </div>
-    <!-- Aspect ratio selection -->
+    <!-- Crop button (initially less prominent) -->
     <div class="form-group">
-        <label>Aspect Ratio:</label><br>
-        <input type="radio" id="ratio11" name="aspectRatio" value="1" checked>
-        <label for="ratio11">1:1</label><br>
-        <input type="radio" id="ratio45" name="aspectRatio" value="4/5">
-        <label for="ratio45">4:5</label>
+        <button type="button" id="crop-it" class="btn btn-secondary" style="display: none;">Crop it</button>
     </div>
-    <!-- Crop confirmation -->
-    <div class="form-group">
-        <button type="button" id="confirm-crop" class="btn btn-primary">Confirm Crop</button>
+    <!-- Cropping area (hidden initially) -->
+    <div id="cropping-area" style="display: none;">
+        <!-- Aspect ratio selection -->
+        <div class="form-group">
+            <label>Aspect Ratio:</label><br>
+            <input type="radio" id="ratio11" name="aspectRatio" value="1" checked>
+            <label for="ratio11">1:1</label><br>
+            <input type="radio" id="ratio45" name="aspectRatio" value="4/5">
+            <label for="ratio45">4:5</label>
+        </div>
+        <!-- Crop confirmation -->
+        <div class="form-group">
+            <button type="button" id="confirm-crop" class="btn btn-primary">Confirm Crop</button>
+        </div>
     </div>
     <!-- Hidden input field for cropped image data -->
     <input type="hidden" name="croppedImageData" id="cropped-image-data">
     <!-- Upload button -->
-    <button type="submit" id="upload-btn" class="btn btn-primary" style="display: none;">Upload</button>
+    <button type="submit" id="upload-btn" class="btn btn-primary">Upload</button>
 </form>
 
 <!-- Include Cropper.js script -->
@@ -47,25 +54,35 @@
     window.addEventListener('DOMContentLoaded', function () {
         var image = document.getElementById('image-preview');
         var cropper;
+        var cropItButton = document.getElementById('crop-it');
+        var croppingArea = document.getElementById('cropping-area');
+        var uploadButton = document.getElementById('upload-btn');
 
         document.getElementById('file').addEventListener('change', function (e) {
             var file = e.target.files[0];
             var reader = new FileReader();
             reader.onload = function (event) {
                 image.src = event.target.result;
-                if (cropper) {
-                    cropper.destroy();
-                }
-                var aspectRatio = document.querySelector('input[name="aspectRatio"]:checked').value;
-                cropper = new Cropper(image, {
-                    aspectRatio: aspectRatio,
-                    viewMode: 1,
-                    zoomable: true,
-                    minContainerWidth: 200,
-                    minContainerHeight: 250
-                });
+                image.style.display = 'block';
+                cropItButton.style.display = 'block';
             };
             reader.readAsDataURL(file);
+        });
+
+        cropItButton.addEventListener('click', function () {
+            croppingArea.style.display = 'block';
+            var aspectRatio = document.querySelector('input[name="aspectRatio"]:checked').value;
+            if (cropper) {
+                cropper.destroy();
+            }
+            cropper = new Cropper(image, {
+                aspectRatio: aspectRatio,
+                viewMode: 1,
+                zoomable: true,
+                minContainerWidth: 200,
+                minContainerHeight: 250
+            });
+            cropItButton.style.display = 'none';
         });
 
         document.querySelectorAll('input[name="aspectRatio"]').forEach(function (input) {
@@ -86,13 +103,20 @@
                 return;
             }
             // Convert the canvas to a base64 string
-            var croppedImageData = canvas.toDataURL('image/jpeg').replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
+            var croppedImageData = canvas.toDataURL('image/jpeg');
 
             // Set the cropped image data as a hidden input value
-            document.getElementById('cropped-image-data').value = croppedImageData;
+            document.getElementById('cropped-image-data').value = croppedImageData.replace(/^data:image\/(png|jpeg|jpg);base64,/, '');
 
-            // Trigger the form submission
-            document.getElementById('upload-form').submit();
+            // Update the image preview with the cropped image
+            image.src = croppedImageData;
+
+            // Show the upload button
+            uploadButton.style.display = 'block';
+
+            // Destroy the cropper and hide the cropping area
+            cropper.destroy();
+            croppingArea.style.display = 'none';
         });
     });
 </script>

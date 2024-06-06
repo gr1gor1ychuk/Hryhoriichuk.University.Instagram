@@ -20,6 +20,8 @@ builder.Services.AddDbContext<AuthDbContext>(options => options.UseSqlServer(con
 
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<AuthDbContext>();
 
+builder.Services.AddSingleton<BlobStorageService>();
+
 builder.Services.RegisterCoreConfiguration(builder.Configuration);
 builder.Services.RegisterCoreDependencies();
 
