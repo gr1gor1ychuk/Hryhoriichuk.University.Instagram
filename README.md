@@ -5,7 +5,7 @@
 - Email: denys.hryhoriichuk@lnu.edu.ua
 - Telegram: https://t.me/grigoriychuk
 - Name of Project: Instagram
-- Link to deployed website: [https://github.com/nastya-prokopishena/Prokpishena.University.Personalized-Fitness-Coaching-Platform.git](https://instbyden.azurewebsites.net/)
+- Link to deployed website: [https://instbyden.azurewebsites.net/](https://instbyden.azurewebsites.net/)
 
 ## Project Description
 Instagram is a social media platform designed for users to share photos and videos. It provides a seamless experience for users to engage with content, connect with others, and discover new perspectives through visual storytelling.
@@ -21,7 +21,7 @@ Instagram is a social media platform designed for users to share photos and vide
 ### Project Setup
 1. After cloning the repository, navigate to the project directory:
 
-cd Prokpishena.University.Personalized-Fitness-Coaching-Platform
+cd Hryhoriichuk.University.Instagram.Web
 
 
 ### Run the Project Locally
