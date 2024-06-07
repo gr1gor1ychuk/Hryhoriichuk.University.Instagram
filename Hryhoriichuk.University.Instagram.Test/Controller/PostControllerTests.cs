@@ -24,7 +24,6 @@ namespace Hryhoriichuk.University.Instagram.Test.Controller
         private AuthDbContext _context;
         private INotificationService _notificationService;
         private IWebHostEnvironment _webHostEnvironment;
-        private BlobStorageService _blobStorageService;
 
         public PostControllerTests()
         {
@@ -33,7 +32,6 @@ namespace Hryhoriichuk.University.Instagram.Test.Controller
             _notificationService = A.Fake<INotificationService>();
             _webHostEnvironment = A.Fake<IWebHostEnvironment>();
 
-            _postController = new PostController(_userManager, _context, _webHostEnvironment, _notificationService, _blobStorageService);
         }
 
         [Fact]
